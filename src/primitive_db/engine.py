@@ -1,28 +1,9 @@
 import prompt
 import shlex
 from .utils import load_metadata, save_metadata
-from .core import create_table, drop_table
+from src.primitive_db.core import create_table, drop_table, list_tables
 
 METADATA_FILE = "db_meta.json"
-
-def welcome():
-    """Функция приветствия и игрового цикла"""
-    print("Первая попытка запустить проект!")
-    print("***")
-    print("<command> exit - выйти из программы")
-    print("<command> help - справочная информация")
-
-    while True:
-
-        command = prompt.string('Введите команду: ').strip().lower() 
-        if command == "exit":
-            print("Выход из программы...")
-            break   
-        elif command == "help":
-            print("<command> exit – выйти из программы")
-            print("<command> help – справочная информация")
-        else:
-            print(f"Неизвестная комманда:{command}")
 
 def parse_columns(column_args):
     """Парсит аргументы столбцов в формат [(name, type), ...]"""
@@ -60,6 +41,15 @@ def run():
                  break
              elif command == "help":
                  print_help()
+             elif command == "list_tables":               
+                 tables = list_tables(metadata)
+                 if tables:
+                     print("Таблицы в базе данных:")
+                     for table in tables:
+                         print(f"  - {table}")
+                 else:
+                      print("В базе данных нет таблиц")    
+
              elif command == "create_table":
                  if len(args) < 3:
                      print("Ошибка: Использование: create_table <имя_таблицы> <столбец1:тип> [столбец2:тип ...]")

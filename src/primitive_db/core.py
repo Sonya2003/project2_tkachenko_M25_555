@@ -31,3 +31,14 @@ def drop_table(metadata, table_name):
     del metadata['tables'][table_name]
     print(f"Таблица '{table_name}' успешно удалена")
     return metadata
+
+def list_tables(metadata):
+    """Возвращает список всех таблиц"""
+    if not isinstance(metadata, dict):
+        return []
+    
+    tables = metadata.get('tables', {})
+    if not isinstance(tables, dict):
+        return []
+    
+    return list(tables.keys())
