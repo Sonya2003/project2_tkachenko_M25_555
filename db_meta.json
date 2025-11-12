@@ -1,3 +1,60 @@
 {
-  "tables": {}
+  "tables": {
+    "s2": {
+      "columns": [
+        [
+          "id",
+          "int"
+        ],
+        [
+          "name",
+          "str"
+        ],
+        [
+          "old",
+          "int"
+        ]
+      ]
+    },
+    "user": {
+      "columns": [
+        [
+          "id",
+          "int"
+        ],
+        [
+          "name",
+          "str"
+        ],
+        [
+          "age",
+          "int"
+        ],
+        [
+          "active",
+          "bool"
+        ]
+      ]
+    },
+    "users": {
+      "columns": [
+        [
+          "id",
+          "int"
+        ],
+        [
+          "name",
+          "str"
+        ],
+        [
+          "age",
+          "int"
+        ],
+        [
+          "active",
+          "bool"
+        ]
+      ]
+    }
+  }
 }
