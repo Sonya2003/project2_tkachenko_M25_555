@@ -1,23 +1,31 @@
 import os
 from .utils import load_table_data, save_table_data
+from ..decorators import handle_db_errors, confirm_action, log_time, create_cacher
 
+select_cacher = create_cacher()
+
+@handle_db_errors
+@log_time
 def select(table_data, where_clause=None):
     """Выбирает записи из табличных данных с возможностью фильтрации"""
-    if where_clause is None:
-        return table_data
+    cache_key = f"select_{len(table_data)}_{str(where_clause)}"
+    def perform_select():
+        if where_clause is None:
+            return table_data
+        filtered_data = []
+        for record in table_data:
+            match = True
+            for key, value in where_clause.items():
+                if record.get(key) != value:
+                    match = False
+                    break
+            if match:
+                filtered_data.append(record)
     
-    filtered_data = []
-    for record in table_data:
-        match = True
-        for key, value in where_clause.items():
-            if record.get(key) != value:
-                match = False
-                break
-        if match:
-            filtered_data.append(record)
-    
-    return filtered_data
+        return filtered_data
+    return select_cacher(cache_key, perform_select)
 
+@handle_db_errors
 def update(table_data, set_clause, where_clause):
     """Обновляет записи в табличных данных"""
     updated_count = 0
@@ -36,6 +44,8 @@ def update(table_data, set_clause, where_clause):
     print(f"Обновлено записей: {updated_count}")
     return table_data
 
+@handle_db_errors
+@confirm_action("удаление данных")
 def delete(table_data, where_clause):
     """Удаляет записи из табличных данных"""
     if where_clause is None:
@@ -51,6 +61,8 @@ def delete(table_data, where_clause):
     print(f"Удалено записей: {deleted_count}")
     return table_data
 
+@handle_db_errors
+@log_time
 def insert(metadata, table_name, values):
     """Добавляет новую запись в таблицу"""
     if 'tables' not in metadata or table_name not in metadata['tables']:
@@ -119,6 +131,7 @@ def insert(metadata, table_name, values):
     print(f"Запись успешно добавлена в таблицу '{table_name}' с ID={new_id}")
     return table_data
 
+@handle_db_errors
 def create_table(metadata, table_name, columns):
     """Создает новую таблицу в метаданных"""
     if 'tables' not in metadata:
@@ -143,7 +156,8 @@ def create_table(metadata, table_name, columns):
     print(f"Таблица '{table_name}' успешно создана")
     return metadata
 
-	
+@handle_db_errors
+@confirm_action("удаление таблицы")
 def drop_table(metadata, table_name):
     """Удаляет таблицу из метаданных"""
     if 'tables' not in metadata or table_name not in metadata['tables']:
