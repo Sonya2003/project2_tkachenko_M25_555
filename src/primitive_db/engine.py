@@ -1,8 +1,18 @@
-import prompt
 import shlex
+
 from prettytable import PrettyTable
-from .utils import load_metadata, save_metadata, load_table_data, save_table_data
-from src.primitive_db.core import create_table, drop_table, list_tables, insert, select, update, delete
+
+from src.primitive_db.core import (
+    create_table,
+    delete,
+    drop_table,
+    insert,
+    list_tables,
+    select,
+    update,
+)
+
+from .utils import load_metadata, load_table_data, save_metadata, save_table_data
 
 METADATA_FILE = "db_meta.json"
 
@@ -35,7 +45,11 @@ def parse_where_condition(where_str):
         field = parts[0].strip()
         value = parts[1].strip()
         
-        if (value.startswith("'") and value.endswith("'")) or (value.startswith('"') and value.endswith('"')):
+        if (
+            (value.startswith("'") and value.endswith("'")) or 
+            (value.startswith('"') and value.endswith('"'))
+        ):
+
             value = value[1:-1]  
         else:
             try:
@@ -71,7 +85,10 @@ def parse_set_clause(set_str):
             field = parts[0].strip()
             value = parts[1].strip()
             
-            if (value.startswith("'") and value.endswith("'")) or (value.startswith('"') and value.endswith('"')):
+            is_single_quoted = value.startswith("'") and value.endswith("'")
+            is_double_quoted = value.startswith('"') and value.endswith('"')
+
+            if is_single_quoted or is_double_quoted:
                 value = value[1:-1] 
             else:
                 try:
@@ -140,7 +157,8 @@ def run():
 
              elif command == "create_table":
                  if len(args) < 3:
-                     print("Ошибка: Использование: create_table <имя_таблицы> <столбец1:тип> [столбец2:тип ...]")
+                     print("Ошибка: Использование: create_table <имя_таблицы>"
+                           "<столбец1:тип> [столбец2:тип ...]")
                  else:
                      table_name = args[1]
                      columns = parse_columns(args[2:])
@@ -188,7 +206,8 @@ def run():
                         display_table_data(result, table_name) 
              elif command == "update":
                 if len(args) < 4:
-                    print("Использование: update <таблица> SET <поле=значение> [WHERE условие]")
+                    print("Использование: update <таблица> SET"
+                          "<поле=значение> [WHERE условие]")
                 else:
                     table_name = args[1]
                     
@@ -205,12 +224,22 @@ def run():
                         print("Ошибка: нет SET")
                         continue
                     
-                    set_str = ' '.join(args[set_index+1:where_index] if where_index != -1 else args[set_index+1:])
-                    where_str = ' '.join(args[where_index+1:]) if where_index != -1 else None
-                    
+                    set_str = ' '.join(
+                        args[set_index+1:where_index] 
+                        if where_index != -1 
+                        else args[set_index+1:]
+                    )
+                    where_str =(
+                        ' '.join(args[where_index+1:]) 
+                        if where_index != -1 
+                        else None
+                    )
                     set_clause = parse_set_clause(set_str)
-                    where_clause = parse_where_condition(where_str) if where_str else None
-                    
+                    where_clause = (
+                       parse_where_condition(where_str)
+                       if where_str 
+                       else None
+                    )
                     if set_clause is None:
                         print("Ошибка в SET")
                         continue

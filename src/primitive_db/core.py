@@ -1,6 +1,7 @@
 import os
+
+from ..decorators import confirm_action, create_cacher, handle_db_errors, log_time
 from .utils import load_table_data, save_table_data
-from ..decorators import handle_db_errors, confirm_action, log_time, create_cacher
 
 select_cacher = create_cacher()
 
@@ -74,7 +75,10 @@ def insert(metadata, table_name, values):
     
     expected_values_count = len(columns) - 1 
     if len(values) != expected_values_count:
-        print(f"Ошибка: Ожидается {expected_values_count} значений, получено {len(values)}")
+        print(
+            f"Ошибка: Ожидается {expected_values_count} значений,"
+            f"получено {len(values)}"
+        )
         return None
     
     table_data = load_table_data(table_name)
@@ -105,18 +109,24 @@ def insert(metadata, table_name, values):
                     elif value.lower() in ('false', '0', 'no', 'нет'):
                         validated_value = False
                     else:
-                        validation_errors.append(f"Столбец '{col_name}': неверное булево значение '{value}'")
+                        validation_errors.append(
+                            f"Столбец '{col_name}': неверное булево значение '{value}'"
+                        )
                         continue
                 else:
                     validated_value = bool(value)
             else:
-                validation_errors.append(f"Столбец '{col_name}': неизвестный тип '{col_type}'")
+                validation_errors.append(
+                    f"Столбец '{col_name}': неизвестный тип '{col_type}'"
+                )
                 continue
                 
             new_record[col_name] = validated_value
             
-        except (ValueError, TypeError) as e:
-            validation_errors.append(f"Столбец '{col_name}': ожидается тип '{col_type}', получено '{value}'")
+        except (ValueError, TypeError):
+            validation_errors.append(
+                f"Столбец '{col_name}': ожидается тип '{col_type}', получено '{value}'"
+            )
     
     if validation_errors:
         print("Ошибки валидации данных:")

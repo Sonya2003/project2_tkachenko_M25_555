@@ -1,6 +1,8 @@
 import json
 import os
+
 from ..decorators import handle_db_errors
+
 
 @handle_db_errors
 def load_metadata(filepath):

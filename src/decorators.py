@@ -1,5 +1,6 @@
 import time
 
+
 def handle_db_errors(func):
     """
     Декоратор для обработки ошибок базы данных
@@ -27,7 +28,9 @@ def confirm_action(action_name):
     """
     def decorator(func):
         def wrapper(*args, **kwargs):
-            response = input(f'Вы уверены, что хотите выполнить "{action_name}"? [y/n]: ')
+            response = input(
+                f'Вы уверены, что хотите выполнить "{action_name}"? [y/n]: '
+            )
             if response.lower() != 'y':
                 print("Операция отменена")
                 return None

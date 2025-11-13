@@ -19,6 +19,22 @@
           "bool"
         ]
       ]
+    },
+    "test": {
+      "columns": [
+        [
+          "id",
+          "int"
+        ],
+        [
+          "name",
+          "str"
+        ],
+        [
+          "age",
+          "int"
+        ]
+      ]
     }
   }
 }
